@@ -1,4 +1,7 @@
 target
 .idea
 *.iml
-这是新的仓库
+
+.classpath
+.project
+.settings

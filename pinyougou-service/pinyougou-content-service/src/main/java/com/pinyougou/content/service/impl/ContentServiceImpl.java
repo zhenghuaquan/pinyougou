@@ -130,6 +130,7 @@ public class ContentServiceImpl implements ContentService {
 			/** 从Redis中获取广告 */
 			contentList = (List<Content>) redisTemplate.boundValueOps("content").get();
 			if (contentList != null && contentList.size() > 0) {
+				System.out.println("从Redis中读取缓存的数据");
                 return contentList;
             }
 		}catch (Exception e){

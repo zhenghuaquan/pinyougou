@@ -4,6 +4,7 @@
 	<head>
 		<meta charset="utf-8"/>
 		<title>品优购搜索</title>
+		<base href="/"/>
 		<link rel="icon" href="assets/img/favicon.ico"/>
 		<link rel="stylesheet" type="text/css" href="/css/webbase.css"/>
 		<link rel="stylesheet" type="text/css" href="/css/pages-list.css"/>
@@ -13,10 +14,17 @@
 		<script src="js/base.js"></script>
 		<script src="js/service/baseService.js"></script>
 		<script src="js/controller/searchController.js"></script>
+
+		<script type="text/javascript">
+            /** 配置位置提供者 */
+            app.config(function($locationProvider){
+                $locationProvider.html5Mode(true);
+            });
+		</script>
 	</head>
 
 	<body ng-app="pinyougou"
-		  ng-init="search()"
+		  ng-init="getkeywords()"
 		  ng-controller="searchController">
 		<!-- 头部栏位 -->
 		<!--页面顶部-->
@@ -81,7 +89,7 @@
 												   type="text"
 												   class="input-error input-xxlarge" />
 											<button class="sui-btn btn-xlarge btn-danger"
-													ng-click="search()"
+													ng-click="searchParam.page=1;search()"
 													type="button">搜索</button>
 										</div>
 									</form>
@@ -148,7 +156,7 @@
 			<div class="bread">
 				<ul class="fl sui-breadcrumb">
 					<li>
-						<a href="#">搜索条件</a>
+						按"<span style="color: red;">{{searchParam.keywords}}</span>"关键字，搜索到 <b>{{resultMap.total}}</b>条记录.
 					</li>
 				</ul>
 				<ul class="tags-choose">
@@ -273,23 +281,23 @@
 				<div class="sui-navbar">
 					<div class="navbar-inner filter">
 						<ul class="sui-nav">
-							<li class="active">
-								<a href="#">综合</a>
+							<li class="{{searchParam.sortField == '' ? 'active' : ''}}">
+								<a href="javascrpt:;" ng-click="sortSearch('','');">综合</a>
 							</li>
 							<li>
 								<a href="#">销量</a>
 							</li>
-							<li>
-								<a href="#">新品</a>
+							<li class="{{searchParam.sortField == 'updateTime' ? 'active' : ''}}">
+								<a href="javascript:;" ng-click="sortSearch('updateTime','DESC')">新品</a>
 							</li>
 							<li>
 								<a href="#">评价</a>
 							</li>
-							<li>
-								<a href="#">价格↑</a>
+							<li class="{{searchParam.sortField == 'price' && searchParam.sort == 'ASC' ? 'active' : ''}}">
+								<a href="javascrpt:;" ng-click="sortSearch('price','ASC');">价格↑</a>
 							</li>
-							<li>
-								<a href="#">价格↓</a>
+							<li class="{{searchParam.sortField == 'price' && searchParam.sort == 'DESC' ? 'active' : ''}}">
+								<a href="javascrpt:;" ng-click="sortSearch('price','DESC');">价格↓</a>
 							</li>
 						</ul>
 					</div>
@@ -327,25 +335,23 @@
 				<div class="fr page">
 					<div class="sui-pagination pagination-large">
 						<ul>
-							<li class="prev disabled">
-								<a href="#">«上一页</a>
+							<li class="prev {{searchParam.page == 1 ? 'disabled' : ''}}">
+								<a href="javascript:;" ng-click="pageSearch(searchParam.page - 1)">«上一页</a>
 							</li>
+							<li class="dotted" ng-if="firstDot"><span>...</span></li>
 							<li class="{{searchParam.page == p ? 'active' : ''}}"
 								ng-repeat="p in pageNums">
-								<a href="#">{{p}}</a>
+								<a href="javascript:;" ng-click="pageSearch(p);">{{p}}</a>
 							</li>
-							<li>
-								<a href="#">2</a>
-							</li>
-							<li class="dotted"><span>...</span></li>
-							<li class="next">
-								<a href="#">下一页»</a>
+							<li class="dotted" ng-if="lastDot"><span>...</span></li>
+							<li class="next {{searchParam.page == resultMap.totalPages ? 'disabled' : ''}}">
+								<a href="javascript:;" ng-click="pageSearch(searchParam.page + 1)">下一页»</a>
 							</li>
 						</ul>
 						<div><span>共{{resultMap.totalPages}}页&nbsp;</span><span>
       到第
-      <input type="text" class="page-num">
-      页 <button class="page-confirm" onclick="alert(1)">确定</button></span></div>
+      <input type="text" class="page-num" style="width: 25px;" ng-model="jumpPage">
+      页 <button class="page-confirm" ng-click="pageSearch(jumpPage)">确定</button></span></div>
 					</div>
 				</div>
 			</div>

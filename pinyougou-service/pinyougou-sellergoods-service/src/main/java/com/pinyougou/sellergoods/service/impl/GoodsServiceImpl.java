@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -204,12 +205,41 @@ public class GoodsServiceImpl implements GoodsService {
     }
 
     /** 修改商品的状态 */
+    @Override
     public  void updateStatus(String columnName, Long[] ids, String status){
         try{
             // UPDATE `tb_goods` SET audit_status = ? WHERE id IN(?,?,?)
             goodsMapper.updateStatus(columnName, ids, status);
         }catch (Exception ex){
             throw new RuntimeException(ex);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getGoods(Long goodsId) {
+        try {
+            /** 定义数据模型 */
+            Map<String,Object> dataModel = new HashMap<>();
+            /** 加载商品SPU数据 */
+            Goods goods = goodsMapper.selectByPrimaryKey(goodsId);
+            dataModel.put("goods",goods );
+            /** 加载商品描述数据 */
+            GoodsDesc goodsDesc = goodsDescMapper.selectByPrimaryKey(goodsId);
+            dataModel.put("goodsDesc", goodsDesc);
+
+            /** 商品分类 */
+            if (goods != null && goods.getCategory3Id() != null) {
+                String itemCat1 = itemCatMapper.selectByPrimaryKey(goods.getCategory1Id()).getName();
+                String itemCat2 = itemCatMapper.selectByPrimaryKey(goods.getCategory2Id()).getName();
+                String itemCat3 = itemCatMapper.selectByPrimaryKey(goods.getCategory3Id()).getName();
+
+                dataModel.put("itemCat1", itemCat1);
+                dataModel.put("itemCat2", itemCat2);
+                dataModel.put("itemCat3", itemCat3);
+            }
+            return dataModel;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

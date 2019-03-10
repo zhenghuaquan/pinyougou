@@ -5,6 +5,7 @@ import com.pinyougou.pojo.SolrItem;
 import com.pinyougou.service.ItemSearchService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
 import org.springframework.data.solr.core.query.*;
 import org.springframework.data.solr.core.query.result.HighlightEntry;
@@ -90,6 +91,16 @@ public class ItemSearchServiceImpl implements ItemSearchService{
                         Criteria criteria1 = new Criteria("spec_" + key).is(specMap.get(key));
                         highlightQuery.addFilterQuery(new SimpleFilterQuery(criteria1));
                     }
+                }
+
+                /** 添加排序 */
+                String sortValue = (String) params.get("sort");
+                String sortField = (String) params.get("sortField");
+                if (StringUtils.isNoneBlank(sortValue) && StringUtils.isNoneBlank(sortField)) {
+                    Sort sort = new Sort("ASC".equalsIgnoreCase(sortValue) ?
+                            Sort.Direction.ASC :Sort.Direction.DESC,sortField);
+                    /** 增加排序 */
+                    highlightQuery.addSort(sort);
                 }
 
                 /** 设置起始记录数 */

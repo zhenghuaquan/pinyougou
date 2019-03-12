@@ -2,6 +2,8 @@ package com.pinyougou.service;
 
 import com.pinyougou.common.pojo.PageResult;
 import com.pinyougou.pojo.Goods;
+import com.pinyougou.pojo.Item;
+
 import java.util.List;
 import java.io.Serializable;
 import java.util.Map;
@@ -39,4 +41,6 @@ public interface GoodsService {
 
     /** 根据id获取商品信息 */
     Map<String,Object> getGoods(Long goodsId);
+
+    List<Item> findItemByGoodsId(Long[] ids);
 }

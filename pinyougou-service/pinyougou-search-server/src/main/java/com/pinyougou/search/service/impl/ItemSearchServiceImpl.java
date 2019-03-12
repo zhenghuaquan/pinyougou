@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Service;
 import com.pinyougou.pojo.SolrItem;
 import com.pinyougou.service.ItemSearchService;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.response.UpdateResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.solr.core.SolrTemplate;
@@ -13,6 +14,7 @@ import org.springframework.data.solr.core.query.result.HighlightPage;
 import org.springframework.data.solr.core.query.result.ScoredPage;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service(interfaceName = "com.pinyougou.service.ItemSearchService")
@@ -145,5 +147,30 @@ public class ItemSearchServiceImpl implements ItemSearchService{
             throw new RuntimeException(e);
         }
         return data;
+    }
+
+    /** 添加或修改商品索引 */
+    @Override
+    public void saveOrUpdate(List<SolrItem> solrItemList) {
+        UpdateResponse updateResponse = solrTemplate.saveBeans(solrItemList);
+        if (updateResponse.getStatus() == 0) {
+            solrTemplate.commit();
+        }else {
+            solrTemplate.rollback();
+        }
+    }
+
+    /** 删除商品索引 */
+    @Override
+    public void delete(List<Long> goodsIds) {
+        Query query = new SimpleQuery();
+        Criteria criteria = new Criteria("goodsId").in(goodsIds);
+        query.addCriteria(criteria);
+        UpdateResponse updateResponse = solrTemplate.delete(query);
+        if (updateResponse.getStatus() == 0) {
+            solrTemplate.commit();
+        }else {
+            solrTemplate.rollback();
+        }
     }
 }

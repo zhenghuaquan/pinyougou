@@ -14,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 商品服务接口实现类
@@ -254,6 +251,19 @@ public class GoodsServiceImpl implements GoodsService {
             List<Item> itemList = itemMapper.selectByExample(example);
             dataModel.put("itemList",JSON.toJSONString(itemList));
             return dataModel;
+        }catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** 查询上架的SKU商品数据 */
+    @Override
+    public List<Item> findItemByGoodsId(Long[] ids) {
+        try {
+            Example example = new Example(Item.class);
+            Example.Criteria criteria = example.createCriteria();
+            criteria.andIn("goodsId", Arrays.asList(ids));
+            return itemMapper.selectByExample(example);
         }catch (Exception e) {
             throw new RuntimeException(e);
         }

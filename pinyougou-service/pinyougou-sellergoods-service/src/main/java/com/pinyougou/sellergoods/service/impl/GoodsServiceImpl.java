@@ -11,6 +11,7 @@ import com.pinyougou.pojo.*;
 import com.pinyougou.service.GoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import tk.mybatis.mapper.entity.Example;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -215,6 +216,7 @@ public class GoodsServiceImpl implements GoodsService {
         }
     }
 
+    /** 商品详情页 http://item.pinyougou.com/149187842867997.html*/
     @Override
     public Map<String, Object> getGoods(Long goodsId) {
         try {
@@ -237,6 +239,20 @@ public class GoodsServiceImpl implements GoodsService {
                 dataModel.put("itemCat2", itemCat2);
                 dataModel.put("itemCat3", itemCat3);
             }
+
+            /** 查询SKU数据 */
+            Example example = new Example(Item.class);
+            /** 查询条件对象 */
+            Example.Criteria criteria = example.createCriteria();
+            /** 状态码为：1 */
+            criteria.andEqualTo("status","1");
+            /** 条件：SPU ID */
+            criteria.andEqualTo("goodsId",goodsId);
+            /** 按是否默认 降序（保证第一个为默认） */
+            example.orderBy("isDefault").desc();
+            /** 根据条件查询SKU商品数据 */
+            List<Item> itemList = itemMapper.selectByExample(example);
+            dataModel.put("itemList",JSON.toJSONString(itemList));
             return dataModel;
         }catch (Exception e) {
             throw new RuntimeException(e);

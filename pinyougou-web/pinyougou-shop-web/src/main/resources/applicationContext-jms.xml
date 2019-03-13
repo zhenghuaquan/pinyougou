@@ -40,4 +40,10 @@
         <!-- 设置主题名 -->
         <constructor-arg value="page.topic"/>
     </bean>
+
+    <!-- 配置消息的目标（发布与订阅）-->
+    <bean id="pageDeleteTopic" class="org.apache.activemq.command.ActiveMQTopic">
+        <!-- 设置主题名 -->
+        <constructor-arg value="page.delete.topic"/>
+    </bean>
 </beans>

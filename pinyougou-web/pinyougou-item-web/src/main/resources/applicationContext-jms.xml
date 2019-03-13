@@ -21,4 +21,10 @@
     </jms:listener-container>
 
     <bean id="pageMessageListener" class="com.pinyougou.item.listener.PageMessageListener"/>
+
+    <jms:listener-container connection-factory="singleConnectionFactory" destination-type="topic">
+        <jms:listener destination="page.delete.topic" ref="deleteMessageListener"/>
+    </jms:listener-container>
+
+    <bean id="deleteMessageListener" class="com.pinyougou.item.listener.DeleteMessageListener"/>
 </beans>

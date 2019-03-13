@@ -35,6 +35,8 @@ public class GoodsController {
     private Destination solrDeleteQueue;
     @Autowired
     private Destination pageTopic;
+    @Autowired
+    private Destination pageDeleteTopic;
 
     /** 添加商品 */
     @PostMapping("/save")
@@ -102,6 +104,14 @@ public class GoodsController {
             } else {
                 // 商品下架
                 jmsTemplate.send(solrDeleteQueue, new MessageCreator() {
+                    @Override
+                    public Message createMessage(Session session) throws JMSException {
+                        return session.createObjectMessage(ids);
+                    }
+                });
+
+                // 发送消息删除静态页面
+                jmsTemplate.send(pageDeleteTopic, new MessageCreator() {
                     @Override
                     public Message createMessage(Session session) throws JMSException {
                         return session.createObjectMessage(ids);
